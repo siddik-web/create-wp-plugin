@@ -1,0 +1,59 @@
+{
+  "name": "create-wp-plugin",
+  "version": "1.0.0",
+  "description": "CLI scaffolding tool for production-ready WordPress plugins with Claude Code support",
+  "type": "module",
+  "bin": {
+    "create-wp-plugin": "./bin/create-wp-plugin.js"
+  },
+  "scripts": {
+    "start": "node bin/create-wp-plugin.js",
+    "test": "node --test tests/**/*.test.js",
+    "lint": "eslint src/ bin/",
+    "prepublishOnly": "npm test"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "inquirer": "^10.1.0",
+    "ora": "^8.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "wordpress",
+    "wordpress-plugin",
+    "plugin",
+    "scaffold",
+    "generator",
+    "cli",
+    "wp-cli",
+    "claude-code",
+    "create-wp-plugin",
+    "boilerplate"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/siddik-web/create-wp-plugin.git"
+  },
+  "homepage": "https://github.com/siddik-web/create-wp-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/siddik-web/create-wp-plugin/issues"
+  },
+  "author": {
+    "name": "Md Siddiqur Rahman",
+    "url": "https://github.com/siddik-web"
+  },
+  "license": "MIT"
+}

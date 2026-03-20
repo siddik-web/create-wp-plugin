@@ -1,0 +1,10 @@
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+.env
+/coverage/
+/tmp/
+# generated plugin output from smoke tests
+smoke-test-plugin/
+my-test-plugin/

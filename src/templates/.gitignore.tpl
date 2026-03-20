@@ -1,0 +1,14 @@
+/vendor/
+/node_modules/
+/build/
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+/reports/
+*.zip
+/tmp/
