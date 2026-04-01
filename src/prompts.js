@@ -1,5 +1,6 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
+import { validateSlug, validateNamespace, validatePrefix, validateVersion } from './validator.js';
 
 /**
  * Convert a slug to a human-readable title
@@ -40,7 +41,7 @@ export async function promptPluginDetails(slugArg, cliOptions) {
       name: 'slug',
       message: 'Plugin slug (lowercase, hyphens):',
       default: slugArg || 'my-awesome-plugin',
-      validate: v => /^[a-z][a-z0-9-]+$/.test(v) || 'Must be lowercase letters, numbers, and hyphens only',
+      validate: validateSlug,
       when: !slugArg,
     },
     {
@@ -78,39 +79,42 @@ export async function promptPluginDetails(slugArg, cliOptions) {
       name: 'namespace',
       message: 'PHP namespace:',
       default: (a) => cliOptions.namespace || slugToNamespace(a.slug || slugArg),
-      validate: v => /^[A-Z][A-Za-z]+$/.test(v) || 'Must be PascalCase letters only',
+      validate: validateNamespace,
     },
     {
       type: 'input',
       name: 'prefix',
       message: 'PHP/JS prefix (for hooks, options, slugs):',
       default: (a) => cliOptions.prefix || slugToPrefix(a.slug || slugArg),
-      validate: v => /^[a-z][a-z0-9]+$/.test(v) || 'Must be lowercase letters/numbers only',
+      validate: validatePrefix,
     },
     {
       type: 'input',
       name: 'minWp',
       message: 'Minimum WordPress version:',
       default: cliOptions.minWp || '6.0',
+      validate: validateVersion,
     },
     {
       type: 'input',
       name: 'minPhp',
       message: 'Minimum PHP version:',
       default: cliOptions.minPhp || '8.1',
+      validate: validateVersion,
     },
     {
       type: 'checkbox',
       name: 'features',
       message: 'Include features:',
       choices: [
-        { name: 'Admin settings page', value: 'admin', checked: cliOptions.admin !== false },
-        { name: 'REST API controller', value: 'restApi', checked: cliOptions.restApi !== false },
-        { name: 'PHPUnit test scaffold', value: 'tests', checked: cliOptions.tests !== false },
-        { name: 'Claude Code files (CLAUDE.md + .claude/)', value: 'claude', checked: cliOptions.claude !== false },
-        { name: 'Custom DB table', value: 'db', checked: true },
-        { name: 'WP-CLI command', value: 'wpcli', checked: false },
-        { name: 'Gutenberg block', value: 'block', checked: false },
+        { name: 'Admin settings page',                              value: 'admin',       checked: cliOptions.admin !== false },
+        { name: 'REST API controller',                              value: 'restApi',     checked: cliOptions.restApi !== false },
+        { name: 'PHPUnit test scaffold',                            value: 'tests',       checked: cliOptions.tests !== false },
+        { name: 'Claude Code files (CLAUDE.md + .claude/)',         value: 'claude',      checked: cliOptions.claude !== false },
+        { name: 'Custom DB table',                                  value: 'db',          checked: cliOptions.withDb !== false },
+        { name: 'WP-CLI command',                                   value: 'wpcli',       checked: cliOptions.wpcli === true },
+        { name: 'Gutenberg block',                                  value: 'block',       checked: cliOptions.block === true },
+        { name: 'WooCommerce integration',                          value: 'woocommerce', checked: cliOptions.woocommerce === true },
       ],
     },
   ]);
@@ -120,13 +124,14 @@ export async function promptPluginDetails(slugArg, cliOptions) {
 
   // Flatten features into booleans
   const features = answers.features || [];
-  answers.hasAdmin   = features.includes('admin');
-  answers.hasRestApi = features.includes('restApi');
-  answers.hasTests   = features.includes('tests');
-  answers.hasClaude  = features.includes('claude');
-  answers.hasDb      = features.includes('db');
-  answers.hasWpCli   = features.includes('wpcli');
-  answers.hasBlock   = features.includes('block');
+  answers.hasAdmin       = features.includes('admin');
+  answers.hasRestApi     = features.includes('restApi');
+  answers.hasTests       = features.includes('tests');
+  answers.hasClaude      = features.includes('claude');
+  answers.hasDb          = features.includes('db');
+  answers.hasWpCli       = features.includes('wpcli');
+  answers.hasBlock       = features.includes('block');
+  answers.hasWooCommerce = features.includes('woocommerce');
 
   delete answers.features;
   return answers;

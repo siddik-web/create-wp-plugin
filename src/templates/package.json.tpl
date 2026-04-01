@@ -2,6 +2,7 @@
   "name": "{{PLUGIN_SLUG}}",
   "version": "1.0.0",
   "description": "{{PLUGIN_DESCRIPTION}}",
+  "author": "{{AUTHOR_NAME}}",
   "private": true,
   "scripts": {
     "start": "wp-scripts start",

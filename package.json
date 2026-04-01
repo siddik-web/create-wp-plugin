@@ -4,7 +4,7 @@
   "description": "CLI scaffolding tool for production-ready WordPress plugins with Claude Code support",
   "type": "module",
   "bin": {
-    "create-wp-plugin": "./bin/create-wp-plugin.js"
+    "create-wp-plugin": "bin/create-wp-plugin.js"
   },
   "scripts": {
     "start": "node bin/create-wp-plugin.js",

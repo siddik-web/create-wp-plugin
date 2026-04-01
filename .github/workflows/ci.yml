@@ -32,7 +32,7 @@ jobs:
         run: npm test
 
   scaffold-smoke-test:
-    name: Scaffold smoke test
+    name: Scaffold smoke test (core)
     runs-on: ubuntu-latest
     needs: test
 
@@ -49,14 +49,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run scaffold (non-interactive)
+      - name: Run scaffold (non-interactive, core features)
         run: |
           node bin/create-wp-plugin.js smoke-test-plugin \
             --author "CI Bot" \
             --author-uri "https://example.com" \
             --namespace "SmokeTestPlugin" \
             --prefix "smoketest" \
-            --no-claude
+            --no-claude \
+            --yes
 
       - name: Verify expected files exist
         run: |
@@ -74,9 +75,104 @@ jobs:
       - name: Verify token replacement
         run: |
           grep -q "SmokeTestPlugin" smoke-test-plugin/smoke-test-plugin.php
-          grep -q "smoketest" smoke-test-plugin/smoke-test-plugin.php
+          grep -q "SMOKETEST_VERSION" smoke-test-plugin/smoke-test-plugin.php
           grep -q "smoke-test-plugin" smoke-test-plugin/composer.json
+          ! grep -q "{{" smoke-test-plugin/smoke-test-plugin.php
+          ! grep -q "{{" smoke-test-plugin/src/includes/class-plugin.php
           echo "Token replacement correct ✔"
+
+      - name: Verify composer.json vendor name is valid
+        run: |
+          python3 -c "
+          import json, sys
+          data = json.load(open('smoke-test-plugin/composer.json'))
+          name = data['name']
+          assert '/' in name, 'Missing vendor separator'
+          vendor = name.split('/')[0]
+          assert ' ' not in vendor, f'Spaces in vendor name: {vendor}'
+          print(f'Composer name valid: {name} ✔')
+          "
+
+  scaffold-smoke-test-optional-features:
+    name: Scaffold smoke test (optional features)
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run scaffold (WooCommerce + block + WP-CLI)
+        run: |
+          node bin/create-wp-plugin.js feature-test-plugin \
+            --author "CI Bot" \
+            --author-uri "https://example.com" \
+            --namespace "FeatureTestPlugin" \
+            --prefix "featuretest" \
+            --no-claude \
+            --woocommerce \
+            --block \
+            --wpcli \
+            --yes
+
+      - name: Verify optional feature files exist
+        run: |
+          test -f feature-test-plugin/src/woocommerce/class-wc-integration.php
+          test -f feature-test-plugin/src/blocks/example-block/block.json
+          test -f feature-test-plugin/src/blocks/example-block/index.js
+          test -f feature-test-plugin/src/cli/class-cli-command.php
+          echo "Optional feature files present ✔"
+
+      - name: Verify no unreplaced tokens in optional files
+        run: |
+          ! grep -rq "{{" feature-test-plugin/src/woocommerce/
+          ! grep -rq "{{" feature-test-plugin/src/blocks/
+          echo "No unreplaced tokens in optional feature files ✔"
+
+  scaffold-dry-run:
+    name: Scaffold dry-run test
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run dry-run (should not create directory)
+        run: |
+          node bin/create-wp-plugin.js dry-run-plugin \
+            --author "CI Bot" \
+            --author-uri "https://example.com" \
+            --namespace "DryRunPlugin" \
+            --prefix "dryrun" \
+            --no-claude \
+            --dry-run \
+            --yes
+
+      - name: Verify no output directory was created
+        run: |
+          if [ -d "dry-run-plugin" ]; then
+            echo "ERROR: dry-run created a directory!" && exit 1
+          fi
+          echo "Dry-run left no files on disk ✔"
 
   lint:
     name: Lint

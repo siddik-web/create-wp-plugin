@@ -3,6 +3,7 @@
  *
  * Replaces {{TOKEN}} placeholders in template strings using plugin context.
  */
+import { toComposerVendor, sanitizeForPhpComment } from './validator.js';
 
 /**
  * Build the full token map from plugin answers.
@@ -20,10 +21,11 @@ export function buildTokens(answers) {
     // Basic info
     '{{PLUGIN_SLUG}}':        slug,
     '{{PLUGIN_NAME}}':        answers.name,
-    '{{PLUGIN_DESCRIPTION}}': answers.description,
+    '{{PLUGIN_DESCRIPTION}}': sanitizeForPhpComment(answers.description),
     '{{PLUGIN_URI}}':         answers.pluginUri || `https://example.com/${slug}`,
     '{{AUTHOR_NAME}}':        answers.author || 'Your Name',
     '{{AUTHOR_URI}}':         answers.authorUri || 'https://example.com',
+    '{{COMPOSER_VENDOR}}':    toComposerVendor(answers.author || 'vendor'),
     '{{MIN_WP}}':             answers.minWp || '6.0',
     '{{MIN_PHP}}':            answers.minPhp || '8.1',
     '{{YEAR}}':               String(year),
@@ -51,6 +53,7 @@ export function buildTokens(answers) {
     '{{NS_ADMIN}}':           `${ns}\\Admin`,
     '{{NS_FRONTEND}}':        `${ns}\\Frontend`,
     '{{NS_API}}':             `${ns}\\Api`,
+    '{{NS_WOOCOMMERCE}}':     `${ns}\\WooCommerce`,
 
     // Class names
     '{{CLASS_PLUGIN}}':       `${ns}\\Includes\\Plugin`,
@@ -59,6 +62,17 @@ export function buildTokens(answers) {
     '{{CLASS_SETTINGS}}':     `${ns}\\Admin\\Settings`,
     '{{CLASS_ASSETS}}':       `${ns}\\Frontend\\Assets`,
     '{{CLASS_REST}}':         `${ns}\\Api\\Items_Controller`,
+    '{{CLASS_WC_INTEGRATION}}': `${ns}\\WooCommerce\\Integration`,
+
+    // Conditional: WooCommerce hook in Plugin::run()
+    '{{WOOCOMMERCE_HOOK}}':   answers.hasWooCommerce
+      ? '\n\t\t$this->register_woocommerce();'
+      : '',
+
+    // Conditional: WooCommerce register method in Plugin class
+    '{{WOOCOMMERCE_METHOD}}': answers.hasWooCommerce
+      ? `\n\t/**\n\t * Boot WooCommerce integration.\n\t */\n\tprivate function register_woocommerce(): void {\n\t\tif ( ! class_exists( 'WooCommerce' ) ) {\n\t\t\treturn;\n\t\t}\n\n\t\t$integration = new \\${ns}\\WooCommerce\\Integration();\n\t\t$integration->register_hooks();\n\t}`
+      : '',
 
     // File name (slug as php filename)
     '{{PLUGIN_FILE}}':        `${slug}.php`,

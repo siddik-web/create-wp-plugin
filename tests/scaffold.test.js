@@ -46,7 +46,7 @@ describe('scaffold file-writer integration', () => {
     assert.ok(existsSync(out), 'Plugin entry file should exist');
     const content = readFileSync(out, 'utf8');
     assert.ok(content.includes('SmokeTest'), 'Namespace token replaced');
-    assert.ok(content.includes('smoketest'), 'Prefix token replaced');
+    assert.ok(content.includes('SMOKETEST_VERSION'), 'Prefix constant token replaced');
     assert.ok(content.includes('smoke-test'), 'Slug token replaced');
     assert.ok(!content.includes('{{'), 'No unreplaced tokens remain');
   });

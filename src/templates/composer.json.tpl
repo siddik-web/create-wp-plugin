@@ -1,8 +1,14 @@
 {
-  "name": "{{AUTHOR_NAME}}/{{PLUGIN_SLUG}}",
+  "name": "{{COMPOSER_VENDOR}}/{{PLUGIN_SLUG}}",
   "description": "{{PLUGIN_DESCRIPTION}}",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "{{AUTHOR_NAME}}",
+      "homepage": "{{AUTHOR_URI}}"
+    }
+  ],
   "require": {
     "php": ">={{MIN_PHP}}"
   },

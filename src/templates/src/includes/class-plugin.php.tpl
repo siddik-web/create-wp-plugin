@@ -35,7 +35,7 @@ class Plugin {
 		$this->load_textdomain();
 		$this->register_admin();
 		$this->register_frontend();
-		$this->register_api();
+		$this->register_api();{{WOOCOMMERCE_HOOK}}
 	}
 
 	/**
@@ -80,4 +80,5 @@ class Plugin {
 			$controller->register_routes();
 		} );
 	}
+{{WOOCOMMERCE_METHOD}}
 }

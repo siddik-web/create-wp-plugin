@@ -1,0 +1,69 @@
+{
+  "permissions": {
+    "allow": [
+      "Read:*",
+      "Bash:git:*",
+      "Bash:npm:*",
+      "Bash:node:*",
+      "Bash:npx:*",
+      "Write:src/**",
+      "Write:tests/**",
+      "Write:bin/**",
+      "Write:.github/**",
+      "Write:CLAUDE.md",
+      "Write:README.md",
+      "Write:CHANGELOG.md"
+    ],
+    "deny": [
+      "Bash:rm -rf:*",
+      "Bash:curl * | bash:*",
+      "Bash:wget * | sh:*",
+      "Bash:git push --force:*",
+      "Bash:git push -f:*",
+      "Bash:npm publish:*",
+      "Write:.claude/settings.json"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "errors=$(find src/ bin/ -name '*.js' 2>/dev/null | xargs -I{} node --check {} 2>&1 | grep -v '^$'); [ -z \"$errors\" ] || { printf 'JS syntax error — blocked:\\n%s\\n' \"$errors\" >&2; exit 2; }",
+            "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "npx eslint --fix --quiet src/ bin/ 2>/dev/null || true",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(cat | python3 -c \"import sys,json;d=json.load(sys.stdin);print(d.get('command',''))\" 2>/dev/null || echo ''); [ -z \"$cmd\" ] && exit 0; echo \"$cmd\" | grep -qE 'rm -rf|curl.+\\|.+bash|wget.+\\|.+sh' && { echo 'Blocked: destructive command — run manually if intentional' >&2; exit 2; }; echo \"$cmd\" | grep -qE 'git push -(-force|-f\\b)' && { echo 'Blocked: force push — run manually after review' >&2; exit 2; }; echo \"$cmd\" | grep -q 'npm publish' && { echo 'Blocked: npm publish — run manually after version bump and changelog review' >&2; exit 2; }; exit 0",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '\\n\\033[1;36m=== create-wp-plugin — dev context ===\\033[0m\\n'; printf 'Stack : Node.js ESM | Commander | Inquirer | Chalk | Ora\\n'; printf 'Test  : npm test            (node --test tests/**/*.test.js)\\n'; printf 'Lint  : npm run lint        (eslint src/ bin/)\\n'; printf 'Run   : node bin/create-wp-plugin.js [slug] [flags]\\n'; printf 'Tpls  : src/templates/      ({{TOKEN}} replaced by template-engine.js)\\n'; printf 'Valid : src/validator.js    (slug, namespace, prefix, version rules)\\n'; printf '\\nNew feature checklist:\\n'; printf '  1  src/prompts.js        — add checkbox + flatten to answers.hasX\\n'; printf '  2  src/template-engine.js — add token(s) in buildTokens()\\n'; printf '  3  src/scaffold.js       — add conditional writeFile() call\\n'; printf '  4  src/templates/        — create .tpl file\\n'; printf '  5  tests/               — add tests for token + validator\\n'; printf '  6  .github/workflows/ci.yml — add smoke-test assertion\\n'; printf '\\033[2mRecent commits:\\033[0m\\n'; git log --oneline -5 2>/dev/null | sed 's/^/  /' || true; printf '\\n'",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -9,13 +9,19 @@ import { render } from './template-engine.js';
  * @param {string} filePath - Relative file path (may contain tokens)
  * @param {string} content  - Template content string
  * @param {object} tokens   - Token map
+ * @returns {string} The rendered relative file path
+ * @throws {Error} With file path context included in the message
  */
 export function writeFile(baseDir, filePath, content, tokens) {
   const renderedPath = render(filePath, tokens);
   const fullPath     = join(baseDir, renderedPath);
 
-  mkdirSync(dirname(fullPath), { recursive: true });
-  writeFileSync(fullPath, render(content, tokens), 'utf8');
+  try {
+    mkdirSync(dirname(fullPath), { recursive: true });
+    writeFileSync(fullPath, render(content, tokens), 'utf8');
+  } catch (err) {
+    throw new Error(`Failed to write ${renderedPath}: ${err.message}`);
+  }
 
   return renderedPath;
 }
