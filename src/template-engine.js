@@ -76,6 +76,14 @@ export function buildTokens(answers) {
 
     // File name (slug as php filename)
     '{{PLUGIN_FILE}}':        `${slug}.php`,
+
+    // WordPress.org metadata
+    '{{TESTED_UP_TO}}':       '6.7',
+    '{{STABLE_TAG}}':         '1.0.0',
+    '{{LICENSE_NAME}}':       answers.hasWpOrg ? 'GPL-2.0-or-later' : 'MIT',
+    '{{LICENSE_URI}}':        answers.hasWpOrg
+      ? 'https://www.gnu.org/licenses/gpl-2.0.html'
+      : 'https://opensource.org/licenses/MIT',
   };
 }
 

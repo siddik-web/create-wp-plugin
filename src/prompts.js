@@ -115,6 +115,7 @@ export async function promptPluginDetails(slugArg, cliOptions) {
         { name: 'WP-CLI command',                                   value: 'wpcli',       checked: cliOptions.wpcli === true },
         { name: 'Gutenberg block',                                  value: 'block',       checked: cliOptions.block === true },
         { name: 'WooCommerce integration',                          value: 'woocommerce', checked: cliOptions.woocommerce === true },
+        { name: 'WordPress.org compliance (GPLv2 + readme.txt)',    value: 'wporg',       checked: cliOptions.wpOrg === true },
       ],
     },
   ]);
@@ -132,7 +133,9 @@ export async function promptPluginDetails(slugArg, cliOptions) {
   answers.hasWpCli       = features.includes('wpcli');
   answers.hasBlock       = features.includes('block');
   answers.hasWooCommerce = features.includes('woocommerce');
+  answers.hasWpOrg       = features.includes('wporg');
 
   delete answers.features;
   return answers;
 }
+

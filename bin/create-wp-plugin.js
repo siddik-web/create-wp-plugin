@@ -33,6 +33,7 @@ program
   .option('--woocommerce', 'Include WooCommerce integration class')
   .option('--block',       'Include Gutenberg block scaffold')
   .option('--wpcli',       'Include WP-CLI command class')
+  .option('--wp-org',      'WordPress.org compliance mode (GPLv2 license + readme.txt, strips Claude files)')
 
   // ── Scaffold behaviour ─────────────────────────────────────────────────────
   .option('--dry-run',     'Preview files that would be created without writing anything')

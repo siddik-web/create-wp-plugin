@@ -72,8 +72,12 @@ function buildFileList(answers) {
 
   // ── Gutenberg block ────────────────────────────────────────────────────────
   if (answers.hasBlock) {
-    add('src/blocks/example-block/block.json', tpl('src/blocks/example-block/block.json.tpl'));
-    add('src/blocks/example-block/index.js',   tpl('src/blocks/example-block/index.js.tpl'));
+    add('src/blocks/example-block/block.json',    tpl('src/blocks/example-block/block.json.tpl'));
+    add('src/blocks/example-block/index.js',      tpl('src/blocks/example-block/index.js.tpl'));
+    add('src/blocks/example-block/edit.js',       tpl('src/blocks/example-block/edit.js.tpl'));
+    add('src/blocks/example-block/save.js',       tpl('src/blocks/example-block/save.js.tpl'));
+    add('src/blocks/example-block/style.scss',    tpl('src/blocks/example-block/style.scss.tpl'));
+    add('src/blocks/example-block/editor.scss',   tpl('src/blocks/example-block/editor.scss.tpl'));
   }
 
   // ── Empty asset stubs ──────────────────────────────────────────────────────
@@ -91,8 +95,14 @@ function buildFileList(answers) {
     add('tests/integration/.gitkeep',   '');
   }
 
-  // ── Claude Code files ──────────────────────────────────────────────────────
-  if (answers.hasClaude) {
+  // ── WordPress.org compliance ───────────────────────────────────────────────
+  if (answers.hasWpOrg) {
+    add('readme.txt', tpl('readme.txt.tpl'));
+    add('LICENSE',    tpl('LICENSE-GPL2.tpl'));
+  }
+
+  // ── Claude Code files (skipped in --wp-org mode) ────────────────────────────
+  if (answers.hasClaude && !answers.hasWpOrg) {
     add('CLAUDE.md',                             tpl('CLAUDE.md.tpl'));
     add('.mcp.json',                             tpl('.mcp.json.tpl'));
     add('.claude/settings.json',                 tpl('.claude/settings.json.tpl'));
@@ -163,11 +173,12 @@ export async function scaffold(slugArg, cliOptions) {
       answers.hasAdmin       && 'Admin settings page',
       answers.hasRestApi     && 'REST API controller',
       answers.hasTests       && 'PHPUnit tests',
-      answers.hasClaude      && 'Claude Code files',
+      answers.hasClaude      && !answers.hasWpOrg && 'Claude Code files',
       answers.hasDb          && 'Custom DB table',
       answers.hasWpCli       && 'WP-CLI command',
       answers.hasBlock       && 'Gutenberg block',
       answers.hasWooCommerce && 'WooCommerce integration',
+      answers.hasWpOrg       && 'WordPress.org compliance (GPLv2)',
     ].filter(Boolean);
 
     console.log('');

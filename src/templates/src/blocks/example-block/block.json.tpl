@@ -16,6 +16,10 @@
       "type":    "string",
       "default": "Hello from {{PLUGIN_NAME}}!"
     },
+    "showBorder": {
+      "type":    "boolean",
+      "default": false
+    },
     "align": {
       "type": "string"
     }
@@ -29,6 +33,10 @@
     },
     "typography": {
       "fontSize": true
+    },
+    "spacing": {
+      "padding": true,
+      "margin":  true
     }
   }
 }

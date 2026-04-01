@@ -9,7 +9,8 @@
     "build": "wp-scripts build",
     "lint:js": "wp-scripts lint-js assets/js",
     "lint:css": "wp-scripts lint-style assets/css",
-    "makepot": "wp i18n make-pot . languages/{{PLUGIN_SLUG}}.pot --domain={{TEXT_DOMAIN}}"
+    "makepot": "wp i18n make-pot . languages/{{PLUGIN_SLUG}}.pot --domain={{TEXT_DOMAIN}}",
+    "plugin-zip": "wp-scripts plugin-zip"
   },
   "devDependencies": {
     "@wordpress/scripts": "^27.0"
